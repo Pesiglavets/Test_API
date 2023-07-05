@@ -1,0 +1,313 @@
+{
+	"info": {
+		"_postman_id": "97a7e912-5cd4-41cc-9456-e33a69b600d6",
+		"name": "SWAPI_PLANETS_FOR_YASP_TEST_FINAL",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28335226"
+	},
+	"item": [
+		{
+			"name": "1. Get Planet list & search params",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = JSON.parse(responseBody);\r",
+							"\r",
+							"let isPlanet = false;\r",
+							"\r",
+							"// Список планет\r",
+							"const planetList = response.count;\r",
+							"\r",
+							"tests[`Всего планет ${planetList}`] = response.count;\r",
+							"\r",
+							"// Поиск планеты - выберите планету\r",
+							"\r",
+							"const currentPlanet = 'Naboo';\r",
+							"pm.environment.set(\"planetName\", currentPlanet);\r",
+							"\r",
+							"tests[`Выбрана планета ${currentPlanet}`] = currentPlanet;\r",
+							"\r",
+							"pm.environment.set(\"planetId\", 'null');\r",
+							"pm.environment.set(\"planetUrl\", '');\r",
+							"pm.environment.set(\"filmsArray\", []);\r",
+							"pm.environment.set(\"firstFilm\", '');\r",
+							"pm.environment.set(\"residentsArray\", []);\r",
+							"pm.environment.set(\"firstResident\", '');\r",
+							"\r",
+							"for (let i = 1; i <= response.results.length; i++) {\r",
+							"    if (response.results[i-1].name === currentPlanet) {\r",
+							"        tests[`Планета ${currentPlanet} найдена`] = currentPlanet;\r",
+							"\r",
+							"        isPlanet = true;\r",
+							"\r",
+							"        if (response.results[i-1].url) {\r",
+							"            const planetUrl = response.results[i-1].url; \r",
+							"            tests[`Id планеты: ${i}`] = true;\r",
+							"            tests[`URL планеты: ${planetUrl}`] = planetUrl;\r",
+							"            pm.environment.set(\"planetId\", i);\r",
+							"            pm.environment.set(\"planetUrl\", planetUrl);\r",
+							"        }\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"if (isPlanet === false) {\r",
+							"    tests[`Выбрана планета ${currentPlanet} не найдена!`] = isPlanet;\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/planets/",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"planets",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Planet by params",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = JSON.parse(responseBody);\r",
+							"const searchedPlanet = pm.environment.get(\"planetName\");\r",
+							"\r",
+							"if (response !== null) {\r",
+							"    tests[`Результат поиска: ${response.name}`] = searchedPlanet === response.name;\r",
+							"    tests['Планета соответствует запросу'] = response.name === searchedPlanet;   \r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/planets/{{planetId}}",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"planets",
+						"{{planetId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get Planet info profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = JSON.parse(responseBody);\r",
+							"\r",
+							"if (response !== null) {\r",
+							"    tests['Параметр {{ name }} - string'] = typeof response.name === 'string';\r",
+							"    tests['Параметр {{ rotation_period }} - string'] = typeof response.rotation_period === 'string';\r",
+							"    tests['Параметр {{ orbital_period }} - string'] = typeof response.orbital_period === 'string';\r",
+							"    tests['Параметр {{ diameter }} - string'] = typeof response.diameter === 'string';\r",
+							"    tests['Параметр {{ climate }} - string'] = typeof response.climate === 'string';\r",
+							"    tests['Параметр {{ gravity }} - string'] = typeof response.gravity === 'string';\r",
+							"    tests['Параметр {{ terrain }} - string'] = typeof response.terrain === 'string';\r",
+							"    tests['Параметр {{ surface_water }} - string'] = typeof response.surface_water === 'string';\r",
+							"    tests['Параметр {{ population }} - string'] = typeof response.population === 'string';\r",
+							"    tests['Параметр {{ created }} - string'] = typeof response.created === 'string';\r",
+							"    tests['Параметр {{ edited }} - string'] = typeof response.edited === 'string';\r",
+							"    tests['Параметр {{ url }} - string'] = typeof response.url === 'string';\r",
+							"    tests['Параметр {{ films }} - array'] = Array.isArray(response.films) === true;\r",
+							"    tests['Параметр {{ residents }} - array'] = Array.isArray(response.residents) === true;\r",
+							"\r",
+							"    // Собираем фильмы\r",
+							"    const filmsArray = [];\r",
+							"    for (var j = 0; j < response.films.length; j++) {\r",
+							"        var filmId = response.films[j].slice(28, -1);\r",
+							"        console.log(filmId);\r",
+							"        filmsArray.push(filmId);\r",
+							"    }\r",
+							"\r",
+							"    pm.environment.set(\"filmsArray\", filmsArray);\r",
+							"\r",
+							"    if (filmsArray.length > 0) {\r",
+							"        pm.environment.set(\"firstFilm\", filmsArray[0]);\r",
+							"    }\r",
+							"\r",
+							"    // Собираем резидентов\r",
+							"    const residentsArray = [];\r",
+							"    for (var k = 0; k < response.residents.length; k++) {\r",
+							"        var residentId = response.residents[k].slice(29, -1);\r",
+							"        console.log(residentId);\r",
+							"        residentsArray.push(residentId);\r",
+							"    }\r",
+							"\r",
+							"    pm.environment.set(\"residentsArray\", residentsArray);\r",
+							"\r",
+							"    if (residentsArray.length > 0) {\r",
+							"        pm.environment.set(\"firstResident\", residentsArray[0]);\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseUrl}}/planets/{{planetId}}",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"planets",
+						"{{planetId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get Planet first film",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = JSON.parse(responseBody);\r",
+							"\r",
+							"if (response !== null) {\r",
+							"    tests[`Название фильма: ${response.title}`] = response.title;\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/films/{{firstFilm}}",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"films",
+						"{{firstFilm}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. Get Planet first resident",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = JSON.parse(responseBody);\r",
+							"\r",
+							"if (response !== null) {\r",
+							"    tests[`Имя резидента: ${response.name}`] = response.name;\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/people/{{firstResident}}",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"people",
+						"{{firstResident}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "planetUrl",
+			"value": ""
+		},
+		{
+			"key": "planetId",
+			"value": ""
+		},
+		{
+			"key": "test",
+			"value": ""
+		},
+		{
+			"key": "newtest",
+			"value": ""
+		},
+		{
+			"key": "newTest",
+			"value": ""
+		},
+		{
+			"key": "newTest2",
+			"value": ""
+		}
+	]
+}
